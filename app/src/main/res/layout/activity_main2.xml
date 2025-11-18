@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.ui.Main_Activity2"
+    android:background="#e9e9e9">
+
+    <TextView
+        android:id="@+id/textMasDetalles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Más detalles"
+        android:textColor="@android:color/black"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="15dp"/>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardForecast"
+        android:layout_width="350dp"
+        android:layout_height="245dp"
+        app:cardBackgroundColor="#FBF4F4"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="8dp"
+        android:layout_marginTop="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardTempActual">
+
+    <!-- Pronóstico 5 días título-->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="5dp">
+
+        <TextView
+            android:id="@+id/pronostico5dias"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pronóstico 5 días"
+            android:textColor="@android:color/black"
+            android:layout_marginLeft="10dp"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+        <!-- Pronóstico 5 días más detalles-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="260dp"
+            android:layout_marginTop="0dp" />
+
+        <!-- Pronóstico 5 días temperaturas-->
+        <LinearLayout
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:translationX="100dp"
+            android:translationY="25dp">
+
+            <TextView
+                android:id="@+id/textDia1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="22dp"
+                android:text="Dia1: 20° / 12° ☀️"
+                android:textColor="@android:color/black"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/textDia2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="22dp"
+                android:text="Dia2: 18° / 10° 🌧️"
+                android:textColor="@android:color/black"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/textDia3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="22dp"
+                android:text="Dia3: 19° / 11° ⛅"
+                android:textColor="@android:color/black"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/textDia4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="22dp"
+                android:text="Dia4: 19° / 11° ⛅"
+                android:textColor="@android:color/black"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/textDia5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dia5: 19° / 11° ⛅"
+                android:textColor="@android:color/black"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardFavCities"
+        android:layout_width="350dp"
+        android:layout_height="245dp"
+        app:cardBackgroundColor="#FBF4F4"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="8dp"
+        android:layout_marginTop="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.508"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardForecast"
+        app:layout_constraintVertical_bias="0.175">
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="5dp">
+
+            <TextView
+                android:id="@+id/textFavCities"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="Tus ciudades favoritas"
+                android:textColor="@android:color/black"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="5dp">
+
+            <TextView
+                android:id="@+id/textFavCities2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="30dp"
+                android:text="Hecha un vistazo a tus ciudades guardadas"
+                android:textColor="#A9A9A9"
+                android:textSize="15sp" />
+
+        </LinearLayout>
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardMiniMapa"
+            android:layout_width="350dp"
+            android:layout_height="180dp"
+            android:layout_marginTop="65dp"
+            app:cardCornerRadius="2dp"
+            app:cardElevation="0dp" />
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardTempActual"
+        android:layout_width="350dp"
+        android:layout_height="190dp"
+        app:cardBackgroundColor="#6a98f2"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="8dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintBottom_toBottomOf="@id/textMasDetalles"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.508"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/cardForecast"
+        app:layout_constraintVertical_bias="0.521">
+
+        <LinearLayout
+            android:layout_width="347dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="8dp">
+
+            <TextView
+                android:id="@+id/textTiempoActual"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tiempo actual en"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="10dp"
+                android:textColor="@android:color/white"
+                android:textSize="26sp" />
+
+            <TextView
+                android:id="@+id/textCity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="7dp"
+                android:layout_marginTop="20dp"
+                android:text="ciudad"
+                android:textColor="@android:color/white"
+                android:textSize="26sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="349dp"
+            android:layout_height="190dp"
+            android:layout_marginLeft="8dp">
+
+            <TextView
+                android:id="@+id/textTemp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="80dp"
+                android:layout_marginTop="90dp"
+                android:text="30º"
+                android:textColor="@android:color/white"
+                android:textSize="50sp" />
+
+            <ImageView
+                android:id="@+id/fotoTiempo"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginTop="75dp"
+                app:layout_constraintBottom_toBottomOf="@id/textTemp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/textTemp"
+                app:srcCompat="@android:drawable/ic_menu_gallery" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/botonInicio"
+        android:layout_width="85dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:src="@drawable/boton_inicio" />
+
+    <SearchView
+        android:id="@+id/searchView"
+        android:layout_width="341dp"
+        android:layout_height="84dp"
+        android:layout_marginTop="30dp"
+        android:background="@color/white"
+        android:queryHint="Buscar ciudad..."
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardFavCities" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
