@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.wheatherapp_full_stack.R
 
 class MainActivity3 : AppCompatActivity() {
+    //Configuración de la página
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -22,11 +23,14 @@ class MainActivity3 : AppCompatActivity() {
 
         // VOLVER HACIA ATRÁS (PÁGINA 2)
 
+        //Buscamos en activity_main3 el botón de volver a la página de detalles
         var botonVolver: ImageView = findViewById<ImageView>(R.id.fotoVolver)
 
+        //Al pulsar en el botón de volver
         botonVolver.setOnClickListener {
+            //Creamos un intent que nos lleva a la página de detalles
             val intent: Intent = Intent(this, Main_Activity2::class.java)
-
+            //Abrimos la pantalla de detalles
             startActivity(intent)
         }
 

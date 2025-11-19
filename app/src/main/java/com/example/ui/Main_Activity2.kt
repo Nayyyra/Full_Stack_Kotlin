@@ -18,7 +18,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 
 class Main_Activity2 : AppCompatActivity() {
 
-    lateinit var mapView: MapView
+    //Configuración de la pantalla
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -32,21 +32,30 @@ class Main_Activity2 : AppCompatActivity() {
 
         // VOLVER A LA PÁGINA DE INICIO
 
+        //Buscamos el boton de inicio dentro de activity_main2
         var botonInicio: ImageView = findViewById<ImageView>(R.id.botonInicio)
 
+        //Cuando hacemos click sobre el boton de inicio
         botonInicio.setOnClickListener {
+            //Creamos un intent que nos lleva de vuelta a la pantalla principal
             val intent: Intent = Intent(this, MainActivity::class.java)
 
+            //Abrimos la pantalla principal
             startActivity(intent)
         }
 
+
         // IR A LA PÁGINA DE CIUDADES FAVORITAS
 
+        //Buscamos la cardview de las ciudades favoritas dentro de activity_main2
         var cardViewCiudades : CardView = findViewById<CardView>(R.id.cardFavCities)
 
+        //Al pulsar sobre la cardView
         cardViewCiudades.setOnClickListener {
+            //Creamos un intent que nos lleva a la página de las ciudades favoritas
             val intent : Intent = Intent(this, MainActivity3::class.java)
 
+            //Abrimos la página de ciudades favoritas
             startActivity(intent)
         }
 
