@@ -7,10 +7,12 @@ import com.squareup.moshi.JsonClass
 //y que usan Moshi para deserializar automáticamente los datos
 
 //Indicamos a moshi que genere un adaptador que pueda
-//convertir JSON a kotlin y viceverdas
+//convertir JSON a kotlin y viceversa
 @JsonClass(generateAdapter = true)
 //Respuesta sobre el clima principal
 data class WeatherResponse(
+    //Coordenadas de la ciudad (latitud/longitud)
+    @Json(name = "coord") val coord: Coord,
     //El campo name (nombre de la ciudad) lo mapeamos a la variable city
     @Json(name = "name") val city: String,
     //El campo main (info del clima principal) lo mapeamos a la clase MainData
@@ -19,13 +21,26 @@ data class WeatherResponse(
     @Json(name = "weather") val weather: List<WeatherDescription>
 )
 
+//Data class para las coordenadas: contiene latitud y longitud
+@JsonClass(generateAdapter = true)
+data class Coord(
+    //Latitud de la ciudad
+    @Json(name = "lat") val lat: Double,
+    //Longitud de la ciudad
+    @Json(name = "lon") val lon: Double
+)
+
 @JsonClass(generateAdapter = true)
 //Sección main del JSON
 data class MainData(
     //El campo temp (temperatura) lo mapeamos a la variable temp
     @Json(name = "temp") val temp: Double,
-    //El campo feelslike (sensación térmica) lo mapeamos a la variable feelslike
-    @Json(name = "feels_like") val feelsLike: Double
+    //El campo feels_like (sensación térmica) lo mapeamos a la variable feelslike
+    @Json(name = "feels_like") val feelsLike: Double,
+    //El campo pressure (presión) lo mapeamos a la variable pressure
+    @Json(name = "pressure") val pressure: Int,
+    //El campo humidity (humedad) lo mapeamos a la variable humedad
+    @Json(name = "humidity") val humidity: Int
 )
 
 @JsonClass(generateAdapter = true)

@@ -16,6 +16,10 @@ data class CachedWeather(
     val temperature: Double,
     //Sensación térmica
     val feelsLike : Double,
+    //Presión
+    val pressure: Int,
+    //Humedad
+    val humidity: Int,
     //Descripción del clima
     val description: String,
     //Cuando se actualizó la info por última vez

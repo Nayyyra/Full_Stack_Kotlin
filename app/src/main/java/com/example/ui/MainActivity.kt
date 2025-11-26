@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
@@ -16,7 +15,6 @@ import com.example.data.WeatherRepository
 import com.example.data.local.WeatherDatabase
 import com.example.data.remote.RetrofitInstance
 import com.example.wheatherapp_full_stack.BuildConfig
-import com.example.wheatherapp_full_stack.R
 import com.example.wheatherapp_full_stack.databinding.ActivityMainBinding
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -24,6 +22,9 @@ import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
+    //Definimos las variables de latitud y longitud y las inicializamos
+    private var latitude: Double = 0.0
+    private var longitude: Double = 0.0
 
     //Con binding podemos acceder a los elementos de la UI de forma segura sin usar findViewById
     private lateinit var binding: ActivityMainBinding
@@ -34,9 +35,54 @@ class MainActivity : AppCompatActivity() {
     //vm (Viewmodel) gestiona los datos del clima y comunica la UI con el repositorio
     private lateinit var vm: WeatherViewModel
 
+    //Si es true, indica que hemos abierto esta pantalla desde una ciudad favorita
+    private var openedFromFavorite: Boolean = false
+
+    // FUNCIÓN PARA CREAR EL CANAL DE NOTIFICACIÓN (solo una vez)
+    private fun createNotificationChannel() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val name = "Alertas Meteo"
+            val descriptionText = "Notificaciones de alertas meteorológicas"
+            val importance = android.app.NotificationManager.IMPORTANCE_HIGH
+            val channel = android.app.NotificationChannel("ALERTA_METEO", name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager: android.app.NotificationManager =
+                getSystemService(android.app.NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    // FUNCIÓN PARA MOSTRAR UNA NOTIFICACIÓN LOCAL
+    private fun mostrarAlertaMeteo(titulo: String, texto: String) {
+        // Comprobación de permiso para Android 13+ antes de mostrar notificación
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                // Si no tienes el permiso, no lanzas la notificación
+                return
+            }
+        }
+        val builder = androidx.core.app.NotificationCompat.Builder(this, "ALERTA_METEO")
+            .setSmallIcon(android.R.drawable.ic_dialog_alert)
+            .setContentTitle(titulo)
+            .setContentText(texto)
+            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+
+        val notificationManager = androidx.core.app.NotificationManagerCompat.from(this)
+        notificationManager.notify(1001, builder.build())
+    }
+
     //Configuración de la página
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Creamos el canal de notificación
+        createNotificationChannel()
+        // Solicitamos permiso de notificación si es Android 13 o superior
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 0)
+        }
 
         //Inicializamos binding
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -45,14 +91,26 @@ class MainActivity : AppCompatActivity() {
         //Inicializamos fused
         fused = LocationServices.getFusedLocationProviderClient(this)
 
-
         // CAMBIAR A PANTALLA DE MÁS DETALLES
         //Cuando pulsemos en el boton de más detalles
-        binding.masDetallesBtn.setOnClickListener {
-            //Creamos un intent que nos lleva a la página de los detalles del tiempo
-            val intent : Intent = Intent(this, Main_Activity2::class.java)
-            //Abrimos la página de los detalles del tiempo
-            startActivity(intent)
+        binding.cardForecast.setOnClickListener {
+            //Solo abrimos detalles si ya tenemos una ubicación válida
+            if (latitude != 0.0 && longitude != 0.0) {
+                //Creamos un intent que nos lleva a la página de los detalles del tiempo
+                val intent : Intent = Intent(this, Main_Activity2::class.java)
+                //Pasamos la latitud y longitud para poder sacar el pronóstico
+                //de 5 días en la siguiente pantalla
+                intent.putExtra("lat", latitude)
+                intent.putExtra("lon", longitude)
+                //Abrimos la página de los detalles del tiempo
+                startActivity(intent)
+            } else {
+                android.widget.Toast.makeText(
+                    this,
+                    "Espera a que se cargue la ubicación.",
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
+            }
         }
 
         // Inicializar BD y repositorio
@@ -72,6 +130,8 @@ class MainActivity : AppCompatActivity() {
         val repo = WeatherRepository(
             //dao nos permite leer y escribir en la bbdd local
             dao = db.dao(),
+            //dao para la tabla de ciudades favoritas
+            favoriteDao = db.favoriteCityDao(),
             //LLamada a la api y uso de apikey
             api = RetrofitInstance.api,
             apiKey = BuildConfig.OPENWEATHER_API_KEY
@@ -82,14 +142,31 @@ class MainActivity : AppCompatActivity() {
         //Se crea tu viewModel con el que puedes acceder a la bbdd y a la API
         vm = ViewModelProvider(this, factory)[WeatherViewModel::class.java]
 
+        //Recogemos datos si vienen de una ciudad guardada en favoritos
+        val cityName = intent.getStringExtra("city_name")
+        val cityLat = intent.getDoubleExtra("city_lat", 0.0)
+        val cityLon = intent.getDoubleExtra("city_lon", 0.0)
+        if (cityName != null && cityLat != 0.0 && cityLon != 0.0) {
+            //Si la actividad se abre desde una ciudad guardada en favoritos
+            openedFromFavorite = true
+            //Cargamos estos datos en la UI
+            latitude = cityLat
+            longitude = cityLon
+            //Cargamos el clima para esa ciudad
+            vm.load(cityLat, cityLon)
+        }
+
         //Llamamos a la función que observa cambios en los datos del clima y actualiza la UI
         setupObservers()
         //Llamamos a la función que solicita permisos de GPS al usuario
-        requestLocationPermission()
+        //y solo pedimos ubicación si no venimos de una ciudad favorita
+        if (!openedFromFavorite) {
+            requestLocationPermission()
+        }
     }
 
 
-    // AQUI GESTIONAMOS LOS VALORES DE TEMPERATURA, NOMBRE DE LA CIUDAD Y ESTADO DEL TIEMPO
+    // AQUI GESTIONAMOS LOS VALORES DE TEMPERATURA, NOMBRE DE LA CIUDAD AND ESTADO DEL TIEMPO
     private fun setupObservers() {
         //Observa los datos en vivo, se ejecuta cada vez que cambian los datos
         vm.weather.observe(this) { data ->
@@ -113,14 +190,21 @@ class MainActivity : AppCompatActivity() {
                 //Mostramos la temperatura
                 binding.textTemp.text = "${data.temperature.toInt()} °C"
                 //Mostramos la descripción del clima
-                binding.textDesc.text = data.description
+                val descBonita = data.description.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(Locale("es", "ES")) else it.toString()
+                }
+                binding.textDesc.text = descBonita
                 //Mostramos la sensación térmica
                 binding.textFeelsLike.text = "${data.feelsLike.toInt()} °C"
+                //Mostramos la presión
+                binding.textActualPressure.text = "${data.pressure} hPa"
+                //Mostramos la humedad
+                binding.textHumidity.text = "${data.humidity} %"
 
-                // SEGUN EL TIEMPO QUE HAGA UN ICONO DISTINTO
+                //Variable para usar después en imagen y animación
                 val weather = data.description.lowercase()
 
-                //Seleccionamos una imágen según la descripción del clima
+                // SEGUN EL TIEMPO QUE HAGA PONEMOS UN ICONO DISTINTO
                 when {
                     weather.contains("pocas nubes") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.parcialmente_nublado)
                     weather.contains("nubes dispersas") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.parcialmente_nublado)
@@ -129,22 +213,81 @@ class MainActivity : AppCompatActivity() {
                     weather.contains("muy nuboso") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.nube)
                     weather.contains("niebla") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.nube)
                     weather.contains("neblina") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.nube)
+                    weather.contains("humo") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.nube)
+                    weather.contains("calima") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.nube)
+                    weather.contains("arena") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.nube)
+                    weather.contains("polvo") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.nube)
+                    weather.contains("ceniza") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.nube)
+                    weather.contains("vendaval") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.nube)
+                    weather.contains("tornado") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.nube)
                     weather.contains("lluvia") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.lluvia)
+                    weather.contains("chubasco") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.lluvia)
                     weather.contains("llovizna") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.lluvia)
                     weather.contains("tormenta") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.tormenta)
                     weather.contains("nieve") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.nieve)
+                    weather.contains("nevada") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.nieve)
                     weather.contains("nevadas") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.nieve)
                     weather.contains("ventisca") -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.nieve)
                     else -> binding.fotoTiempo.setImageResource(com.example.wheatherapp_full_stack.R.drawable.sol)
                 }
 
-            }
+                //Animación Lottie según clima
+                val animView = binding.weatherAnimation
+                when {
+                            weather.contains("sol") ||
+                            weather.contains("despejado") -> {
+                        animView.setAnimation(com.example.wheatherapp_full_stack.R.raw.sunny)
+                    }
+                            weather.contains("lluvia") ||
+                            weather.contains("llovizna")||
+                            weather.contains("chubasco") -> {
+                        animView.setAnimation(com.example.wheatherapp_full_stack.R.raw.rainy)
+                    }
+                            weather.contains("nubes") ||
+                            weather.contains("nublado") ||
+                            weather.contains("nuboso") ||
+                            weather.contains("niebla") ||
+                            weather.contains("neblina") ||
+                            weather.contains("humo") ||
+                            weather.contains("calima") ||
+                            weather.contains("arena") ||
+                            weather.contains("polvo") ||
+                            weather.contains("ceniza") ||
+                            weather.contains("vendaval")-> {
+                        animView.setAnimation(com.example.wheatherapp_full_stack.R.raw.cloudy)
+                    }
+                        weather.contains("tormenta")||
+                        weather.contains("tornado") -> {
+                        animView.setAnimation(com.example.wheatherapp_full_stack.R.raw.storm)
+                    }
+                        weather.contains("nieve") ||
+                        weather.contains("nevada") ||
+                        weather.contains("nevadas") ||
+                        weather.contains("ventisca") -> {
+                        animView.setAnimation(com.example.wheatherapp_full_stack.R.raw.snow)
+                    }
+                    else -> {
+                        animView.setAnimation(com.example.wheatherapp_full_stack.R.raw.sunny)
+                    }
+                }
+                animView.playAnimation()
 
+                // ALERTA LOCAL SI HAY TORMENTA O LLUVIA FUERTE
+                if (weather.contains("tormenta")) {
+                    mostrarAlertaMeteo("¡Alerta meteorológica!", "Tormenta detectada en ${data.cityName}")
+                }
+                if (weather.contains("lluvia")) {
+                    mostrarAlertaMeteo("¡Alerta meteorológica!", "Lluvias en ${data.cityName}")
+                }
+
+                if (weather.contains("nubes")) {
+                    mostrarAlertaMeteo("¡Alerta meteorológica!", "Cielo nublado en ${data.cityName}")
+                }
+            }
         }
     }
 
-
-    /** PERMISOS DE UBICACIÓN */
+    // PERMISOS DE UBICACIÓN
 
     //Creamos un permissionLauncher para que solicite permisos de ubicación
     private val permissionLauncher =
@@ -157,16 +300,25 @@ class MainActivity : AppCompatActivity() {
         //Comprobamos si ya hay permisos de ubicación
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED) {
+            //Si ya está concedido, usamos directamente la ubicación
             fetchLocation()
         } else {
             //Sino los solicita
             permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
+
+        android.util.Log.d(
+            "GPS_TEST",
+            "checkSelfPermission=${ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)}"
+        )
     }
 
     //Obtener ubicación
     @SuppressLint("MissingPermission")
     private fun fetchLocation() {
+        //Si venimos de una ciudad favorita, no actualizamos por GPS
+        if (openedFromFavorite) return
+
         //Vamos actualizando y almacenando la ubicación cada segundo
         val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000).build()
 
@@ -178,6 +330,9 @@ class MainActivity : AppCompatActivity() {
                 val location = result.lastLocation
                 //Si hay ubicación
                 if (location != null) {
+                    //Asignamos valor a las variables de la ubicación
+                    latitude = location.latitude
+                    longitude = location.longitude
                     //Actualizamos el clima según las coordenadas
                     vm.load(location.latitude, location.longitude)
                     //Dejamos de recibir actualizaciones después de obtener la primera ubicación

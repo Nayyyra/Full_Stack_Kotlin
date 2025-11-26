@@ -2,7 +2,10 @@ package com.example.data
 
 import android.util.Log
 import com.example.data.local.CachedWeather
+import com.example.data.local.FavoriteCity
+import com.example.data.local.FavoriteCityDao
 import com.example.data.local.WeatherDao
+import com.example.data.remote.ForecastItem
 import com.example.data.remote.WeatherApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -10,8 +13,10 @@ import kotlinx.coroutines.withContext
 
 //Esta clase centraliza el acceso tanto a los datos locales (Room) como a los datos remotos (API)
 class WeatherRepository(
-    //dao para acceder a la bbdd local (Room)
+    //dao (objeto) para acceder a la bbdd local (Room)
     private val dao: WeatherDao,
+    //dao para acceder a la tabla de ciudades favoritas
+    private val favoriteDao: FavoriteCityDao,
     //api para hacer peticiones a la API de OpenWeatherMap
     private val api: WeatherApiService,
     //Mi apikey para autenticar las solicitudes
@@ -45,6 +50,10 @@ class WeatherRepository(
                     temperature = networkWeather.main.temp,
                     //Sensación térmica
                     feelsLike = networkWeather.main.feelsLike,
+                    //Presión
+                    pressure = networkWeather.main.pressure,
+                    //Humedad
+                    humidity = networkWeather.main.humidity,
                     //Descripción del clima (si es nulo pondrá N/A)
                     description = networkWeather.weather.firstOrNull()?.description ?: "N/A",
                     //Hora actual en milisegundos
@@ -65,4 +74,45 @@ class WeatherRepository(
         }
     }
 
+    //Función para el pronóstico de 5 días
+    //Pasamos por parámetro la latitud y longitud de la ubicación
+    //Devuelve la lista de items que forman el pronóstico
+    suspend fun getFiveDayForecast(lat: Double, lon: Double): List<ForecastItem>? {
+        try {
+            //Guardas la respuesta de la api según los datos de la ubicación
+            val response = api.getFiveDayForecast(lat, lon, apiKey)
+            //Si la petición ha sido exitosa y hay datos
+            if (response.isSuccessful && response.body() != null) {
+                //Obtiene los datos ya deserializados y te los devuelve como lista de items del pronóstico
+                return response.body()!!.list
+            }
+        } catch (e: Exception) {
+            //Manejamos posibles errores y los registramos en un log
+            Log.e("WeatherRepository", "Error getting 5-day forecast", e)
+        }
+        //Si hubiese algún error, se devuelve null
+        return null
+    }
+
+    //CIUDADES FAVORITAS
+
+    //Devuelve un flow con todas las ciudades favoritas guardadas
+    fun getFavoriteCities(): Flow<List<FavoriteCity>> = favoriteDao.getAll()
+
+    //Guarda o actualiza una ciudad favorita
+    suspend fun saveFavoriteCity(city: FavoriteCity) {
+        favoriteDao.insert(city)
+    }
+
+    //Borra una ciudad favorita concreta
+    suspend fun deleteFavoriteCity(city: FavoriteCity) {
+        favoriteDao.delete(city)
+    }
+
+    //Comprueba si la ciudad ya está guardada por nombre
+    suspend fun isFavoriteCity(name: String): Boolean {
+        //Al devolver un boolean 0 = ciudad nueva / !0 = ya existe
+        return favoriteDao.countByName(name) > 0
+    }
 }
+

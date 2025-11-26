@@ -58,6 +58,7 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-moshi:2.11.0")
     implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
     implementation(libs.play.services.maps)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     kapt("com.squareup.moshi:moshi-kotlin-codegen:1.15.0")
 
     // ---- COROUTINES ----
@@ -89,5 +90,8 @@ dependencies {
         testImplementation(libs.junit)
         androidTestImplementation(libs.androidx.junit)
         androidTestImplementation(libs.androidx.espresso.core)
+
+    // IMPLEMENTACIÓN PARA ANIMACIONES
+    implementation("com.airbnb.android:lottie:6.4.0")
 
     }

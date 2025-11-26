@@ -8,7 +8,7 @@ import retrofit2.http.Query
 interface WeatherApiService {
     //Definimos el endpoint(punto de acceso a la API) para hacer una petición GET
     //Va a la ruta wheather dentro de la URL base
-    //Es decir: https://api.openweathermap.org/data/2.5/weather
+    //Es decir: [https://api.openweathermap.org/data/2.5/weather](https://api.openweathermap.org/data/2.5/weather)
     @GET("weather")
     //Función para obtener el clima actual en segundo plano (suspend)
     //de forma que no bloquee la UI
@@ -29,5 +29,37 @@ interface WeatherApiService {
     ): Response<WeatherResponse>
 
 
+    @GET("forecast")
+    //Función para obtener el pronóstico de 5 días
+    suspend fun getFiveDayForecast(
+        //Parámetros que se piden
+        //Latitud de la ubicación
+        @Query("lat") latitude: Double,
+        //Longitud de la ubicación
+        @Query("lon") longitude: Double,
+        //La APIKEY
+        @Query("appid") apiKey: String,
+        //Que el idioma por defecto de la respuesta sea español
+        @Query("lang") lang: String = "es",
+        //Unidades del clima (celsius=metric)
+        @Query("units") units: String = "metric"
+        //Recibimos respuesta de tipo FiveDayForecastResponse
+        //envuelta en Response para manejar errores
+    ): Response<FiveDayForecastResponse>
 
+
+    @GET("weather")
+    //Obtener la información del tiempo de una ciudad usando su nombre
+    suspend fun getCurrentWeatherByCity(
+        //Nombre de la ciudad y país opcional (ej: Madrid,ES)
+        @Query("q") cityName: String,
+        //La APIKEY
+        @Query("appid") apiKey: String,
+        //Que el idioma por defecto de la respuesta sea español
+        @Query("lang") lang: String = "es",
+        //Unidades del clima (celsius=metric)
+        @Query("units") units: String = "metric"
+        //Recibimos respuesta de tipo WeatherResponse también
+        //envuelta en un response para manejar errores
+    ): Response<WeatherResponse>
 }

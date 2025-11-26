@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- PERMISOS NECESARIOS PARA NOTIFICACIONES PUSH -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
         android:allowBackup="true"
@@ -21,7 +23,7 @@
             android:exported="true" />
         <activity
             android:name="com.example.ui.Main_Activity2"
-            android:exported="true" /> <!-- TU ACTIVIDAD PRINCIPAL -->
+            android:exported="true" />
         <activity
             android:name="com.example.ui.MainActivity"
             android:exported="true">
