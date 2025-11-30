@@ -168,9 +168,12 @@ class Main_Activity2 : AppCompatActivity() {
         binding.botonInicio.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             //Si quieres volver usando la misma ciudad del forecast actual:
-            intent.putExtra("city_name", "") // o el nombre si lo tienes
+            //Nombre de la ciudad
+            intent.putExtra("city_name", "")
+            //Coordenadas
             intent.putExtra("city_lat", lat)
             intent.putExtra("city_lon", lon)
+            //Abrimos la pantalla
             startActivity(intent)
         }
 
@@ -273,10 +276,19 @@ class Main_Activity2 : AppCompatActivity() {
             desc.contains("nubes") -> R.drawable.nube
             desc.contains("niebla") -> R.drawable.nube
             desc.contains("neblina") -> R.drawable.nube
+            desc.contains("humo") -> R.drawable.nube
+            desc.contains("calima") -> R.drawable.nube
+            desc.contains("arena") -> R.drawable.nube
+            desc.contains("polvo") -> R.drawable.nube
+            desc.contains("ceniza") -> R.drawable.nube
+            desc.contains("vendaval") -> R.drawable.nube
+            desc.contains("tornado") -> R.drawable.nube
             desc.contains("lluvia") -> R.drawable.lluvia
+            desc.contains("chubasco") -> R.drawable.lluvia
             desc.contains("llovizna") -> R.drawable.lluvia
             desc.contains("tormenta") -> R.drawable.tormenta
             desc.contains("nieve") -> R.drawable.nieve
+            desc.contains("nevada") -> R.drawable.nieve
             desc.contains("nevadas") -> R.drawable.nieve
             desc.contains("ventisca") -> R.drawable.nieve
             else -> R.drawable.sol

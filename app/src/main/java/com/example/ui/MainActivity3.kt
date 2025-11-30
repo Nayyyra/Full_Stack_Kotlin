@@ -69,7 +69,7 @@ class MainActivity3 : AppCompatActivity() {
         //Configuramos el RecyclerView con su adapter y 2 callbacks
         favAdapter = FavoriteCitiesAdapter(
             onDeleteClicked = { ciudad ->
-                //Cuando pulsan la papelera, borramos la ciudad
+                //Cuando pulsamos la papelera, borramos la ciudad
                 lifecycleScope.launch {
                     repo.deleteFavoriteCity(ciudad)
                 }

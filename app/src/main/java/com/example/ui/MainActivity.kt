@@ -38,15 +38,24 @@ class MainActivity : AppCompatActivity() {
     //Si es true, indica que hemos abierto esta pantalla desde una ciudad favorita
     private var openedFromFavorite: Boolean = false
 
-    // FUNCIÓN PARA CREAR EL CANAL DE NOTIFICACIÓN (solo una vez)
+    // FUNCIÓN PARA CREAR EL CANAL DE NOTIFICACIONES
     private fun createNotificationChannel() {
+        //Verificamos si la versión de Android permite enviar notificaciones
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            //Nombre para el canal de notificaciones
             val name = "Alertas Meteo"
+            //Descripción del canal de notificaciones
             val descriptionText = "Notificaciones de alertas meteorológicas"
+            //Definimos que la importancia de las notificaciones será alta, por lo que:
+            //Tendrán sonido, aparecerán como alerta y se consideran de alta prioridad
             val importance = android.app.NotificationManager.IMPORTANCE_HIGH
+            //Creamos el canal de notificaciones
             val channel = android.app.NotificationChannel("ALERTA_METEO", name, importance).apply {
+                //Asignamos la descripción al declarada previamente al canal de notificaciones
                 description = descriptionText
             }
+            //Registramos el canal de notifiacioknes en el sistema Android con notificatioManager
+            //que se encarga de gestionar las notificaciones en el sistema
             val notificationManager: android.app.NotificationManager =
                 getSystemService(android.app.NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
@@ -54,22 +63,34 @@ class MainActivity : AppCompatActivity() {
     }
 
     // FUNCIÓN PARA MOSTRAR UNA NOTIFICACIÓN LOCAL
+    //Recibimos por parámetro el título y el contenido de la notificación
     private fun mostrarAlertaMeteo(titulo: String, texto: String) {
-        // Comprobación de permiso para Android 13+ antes de mostrar notificación
+        //Comprobamos los permisos para Android 13+ antes de mostrar notificaciones
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            //Comprobamos si el permiso de las notificaciones se ha concedido
             if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                // Si no tienes el permiso, no lanzas la notificación
+                //Si no tienes el permiso, no lanzas la notificación
                 return
             }
         }
+        //Con el NotificationCompat.Builder construimos la notificación
+        //Con this usamos el contexto y "ALERTA-METEO" es el canal para la notificación
         val builder = androidx.core.app.NotificationCompat.Builder(this, "ALERTA_METEO")
+            //Icono para las notificaciones
             .setSmallIcon(android.R.drawable.ic_dialog_alert)
+            //Titulo de la notificación
             .setContentTitle(titulo)
+            //Texto de la notificación
             .setContentText(texto)
+            //Prioridad alta para la notificación
             .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+            //La notificación desaparece automáticamente cuando el ususario la toca
             .setAutoCancel(true)
 
+        //Obtenemos un NotificationManagerCompact para poder enviar la notifiación
+        //de forma compatible con la versión de Android
         val notificationManager = androidx.core.app.NotificationManagerCompat.from(this)
+        //Enviamos la notificación con un ID único para ella y construyendola con builder.build
         notificationManager.notify(1001, builder.build())
     }
 
@@ -77,10 +98,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Creamos el canal de notificación
+        //Creamos el canal de notificación
         createNotificationChannel()
-        // Solicitamos permiso de notificación si es Android 13 o superior
+        //Solicitamos permiso de notificación si es Android 13 o superior
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            //Pedimos permiso al usuario para enviar notificaciones
             requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 0)
         }
 
@@ -92,7 +114,8 @@ class MainActivity : AppCompatActivity() {
         fused = LocationServices.getFusedLocationProviderClient(this)
 
         // CAMBIAR A PANTALLA DE MÁS DETALLES
-        //Cuando pulsemos en el boton de más detalles
+
+        //Cuando pulsemos en la CardView de más detalles
         binding.cardForecast.setOnClickListener {
             //Solo abrimos detalles si ya tenemos una ubicación válida
             if (latitude != 0.0 && longitude != 0.0) {
@@ -105,7 +128,10 @@ class MainActivity : AppCompatActivity() {
                 //Abrimos la página de los detalles del tiempo
                 startActivity(intent)
             } else {
+                //Si aún no tenemos las coordenadas de la ubicación actual (suelen tardar en cargar)
+                //Mostramos este toast que será un mensaje que aparecerá en pequeñito
                 android.widget.Toast.makeText(
+                    //Y nos informará que se está cargando aún la ubicaición
                     this,
                     "Espera a que se cargue la ubicación.",
                     android.widget.Toast.LENGTH_SHORT
@@ -113,7 +139,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Inicializar BD y repositorio
+        //INICIALIZAR BBDD Y REPOSITORIO
+
         //Creamos la bbdd local con Room
         val db = Room.databaseBuilder(
             //La bbdd se llamará weather.db
@@ -272,7 +299,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 animView.playAnimation()
 
-                // ALERTA LOCAL SI HAY TORMENTA O LLUVIA FUERTE
+                // ALERTA LOCAL SI HAY TORMENTA, LLUVIA FUERTE O NUBES
                 if (weather.contains("tormenta")) {
                     mostrarAlertaMeteo("¡Alerta meteorológica!", "Tormenta detectada en ${data.cityName}")
                 }
@@ -306,14 +333,9 @@ class MainActivity : AppCompatActivity() {
             //Sino los solicita
             permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
-
-        android.util.Log.d(
-            "GPS_TEST",
-            "checkSelfPermission=${ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)}"
-        )
     }
 
-    //Obtener ubicación
+    //OBTENER UBICACIÓN
     @SuppressLint("MissingPermission")
     private fun fetchLocation() {
         //Si venimos de una ciudad favorita, no actualizamos por GPS

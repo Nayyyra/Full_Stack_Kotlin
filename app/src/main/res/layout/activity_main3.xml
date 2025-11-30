@@ -27,7 +27,7 @@
             android:id="@+id/textCiudadesFav"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tus ciudades favoritas"
+            android:text="@string/ciudadesFavTitulo"
             android:textColor="@android:color/black"
             android:textSize="26sp"
             android:textStyle="bold"

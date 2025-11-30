@@ -5,6 +5,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 //Esta clase es un singletone (solo existe una instancia de esta clase)
+//El cliente Retrofit es el que se encarga de hacer todas las peticiones a la api en remoto
 object RetrofitInstance {
 
     //Definimos la url base de la API, a la que se harán las peticiones

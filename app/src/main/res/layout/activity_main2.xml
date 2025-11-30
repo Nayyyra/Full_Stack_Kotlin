@@ -19,7 +19,7 @@
             android:id="@+id/textMasDetalles"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Más detalles"
+            android:text="@string/masDetallesTitulo"
             android:textColor="@android:color/black"
             android:textSize="26sp"
             android:textStyle="bold"
@@ -58,7 +58,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="Pronóstico 5 días"
+                        android:text="@string/forecastTitulo"
                         android:textColor="@android:color/white"
                         android:textSize="22sp"
                         android:textStyle="bold" />
@@ -82,7 +82,7 @@
                             android:id="@+id/textDia1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Día 1"
+                            android:text="@string/dia_1"
                             android:textColor="@android:color/white"
                             android:textSize="18sp" />
                     </LinearLayout>
@@ -106,7 +106,7 @@
                             android:id="@+id/textDia2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Día 2"
+                            android:text="@string/dia_2"
                             android:textColor="@android:color/white"
                             android:textSize="18sp" />
                     </LinearLayout>
@@ -130,7 +130,7 @@
                             android:id="@+id/textDia3"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Día 3"
+                            android:text="@string/dia_3"
                             android:textColor="@android:color/white"
                             android:textSize="18sp" />
                     </LinearLayout>
@@ -154,7 +154,7 @@
                             android:id="@+id/textDia4"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Día 4"
+                            android:text="@string/dia_4"
                             android:textColor="@android:color/white"
                             android:textSize="18sp" />
                     </LinearLayout>
@@ -178,7 +178,7 @@
                             android:id="@+id/textDia5"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Día 5"
+                            android:text="@string/dia_5"
                             android:textColor="@android:color/white"
                             android:textSize="18sp" />
                     </LinearLayout>
@@ -212,7 +212,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:text="Tus ciudades favoritas"
+                    android:text="@string/ciudadesFavTitulo"
                     android:textColor="@android:color/black"
                     android:textSize="18sp" />
             </LinearLayout>
@@ -229,7 +229,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="35dp"
-                    android:text="Hecha un vistazo a tus ciudades guardadas"
+                    android:text="@string/ciudadesFavContenido"
                     android:textColor="#A9A9A9"
                     android:textSize="15sp" />
 

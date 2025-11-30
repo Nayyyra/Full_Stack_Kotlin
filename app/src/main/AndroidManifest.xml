@@ -4,8 +4,8 @@
     package="com.example.wheatherapp_full_stack">
     <!-- PERMISOS NECESARIOS PARA UBICACIÓN Y RED -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <!-- PERMISOS NECESARIOS PARA NOTIFICACIONES PUSH -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 

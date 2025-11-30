@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">SkyMood</string>
+    <string name="masDetalles">Accede a:\n ▶Pronóstico de 5 días\n ▶Buscar ciudades\n ▶Listar ciudades favoritas</string>
+    <string name="nombreCiudad">Ciudad</string>
+    <string name="fechaActual">Sábado, 9 de noviembre</string>
+    <string name="descClima">Parcialmente nublado</string>
+    <string name="textoVacioTemp">__º</string>
+    <string name="textoVacioPresion">__ mp/h</string>
+    <string name="textoVacioHumedad">__%</string>
+    <string name="celsius">Celsius</string>
+    <string name="presion">Presión</string>
+    <string name="sensacionTermica">Sensación térmica</string>
+    <string name="humedad">Humedad</string>
+    <string name="masDetallesTitulo">Más detalles</string>
+    <string name="forecastTitulo">Pronóstico 5 días</string>
+    <string name="dia_1">Día 1</string>
+    <string name="dia_2">Día 2</string>
+    <string name="dia_3">Día 3</string>
+    <string name="dia_4">Día 4</string>
+    <string name="dia_5">Día 5</string>
+    <string name="ciudadesFavTitulo">Tus ciudades favoritas</string>
+    <string name="ciudadesFavContenido">Hecha un vistazo a tus ciudades guardadas</string>
+    <string name="ciudad">Ciudad</string>
+    <string name="coord">Coordenadas</string>
 </resources>
