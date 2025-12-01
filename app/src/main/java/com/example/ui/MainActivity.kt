@@ -113,6 +113,27 @@ class MainActivity : AppCompatActivity() {
         //Inicializamos fused
         fused = LocationServices.getFusedLocationProviderClient(this)
 
+
+        //BOTÓN (ICONO) PARA RECARGAR A LA UBICACIÓN ACTUAL
+
+        //Cuando pulsemos en el icono de "Mi ubicación" volvemos a usar el GPS
+        binding.btnUseCurrentLocation.setOnClickListener {
+            //Dejamos de usar ciudad favorita fija
+            openedFromFavorite = false
+            //Reiniciamos las coordenadas
+            latitude = 0.0
+            longitude = 0.0
+            //Volvemos a pedir permiso / ubicación
+            requestLocationPermission()
+            //Mostramos un mensaje usando toast indicando que se está buscando la ubicación actual
+            android.widget.Toast.makeText(
+                this,
+                "Buscando tu ubicación actual...",
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+        }
+
+
         // CAMBIAR A PANTALLA DE MÁS DETALLES
 
         //Cuando pulsemos en la CardView de más detalles
@@ -131,7 +152,7 @@ class MainActivity : AppCompatActivity() {
                 //Si aún no tenemos las coordenadas de la ubicación actual (suelen tardar en cargar)
                 //Mostramos este toast que será un mensaje que aparecerá en pequeñito
                 android.widget.Toast.makeText(
-                    //Y nos informará que se está cargando aún la ubicaición
+                    //Y nos informará que se está cargando aún la ubicación
                     this,
                     "Espera a que se cargue la ubicación.",
                     android.widget.Toast.LENGTH_SHORT
@@ -319,8 +340,20 @@ class MainActivity : AppCompatActivity() {
     //Creamos un permissionLauncher para que solicite permisos de ubicación
     private val permissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            //Si se aceptan los permisos se llama a fetchLocation()
-            if (granted) fetchLocation()
+            //Si se aceptan los permisos
+            if (granted) {
+                //Se llama a fetchLocation() para obtener la ubicación
+                fetchLocation()
+            } else {
+                //Si el permiso no se concede, comprobamos si el usuario marcó "No preguntar de nuevo"
+                if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    //Si está denegado permanentemente te sugiere abrir ajustes para que el usuario lo habilite manualmente
+                    showPermissionDeniedPermanentlyDialog()
+                } else {
+                    //Si el usuario lo denegó sin seleccionar “no volver a preguntar”, mostramos un mensaje Toast
+                    android.widget.Toast.makeText(this, "Permiso de ubicación denegado.", android.widget.Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
     private fun requestLocationPermission() {
@@ -330,9 +363,48 @@ class MainActivity : AppCompatActivity() {
             //Si ya está concedido, usamos directamente la ubicación
             fetchLocation()
         } else {
-            //Sino los solicita
-            permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            //Si no está concedido
+            //Mostramos un rationale explicando por qué necesitamos el permiso
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                //Mostramos diálogo explicativo
+                androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("Permiso de ubicación")
+                    .setMessage("La app necesita acceso a la ubicación para mostrar el clima local. ¿Deseas permitirlo?")
+                    .setPositiveButton("Permitir") { _, _ ->
+                        //Si el usuario acepta, lanzamos el request de permiso
+                        permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    }
+                    //Si le da a cancelar, no se pide el permiso
+                    .setNegativeButton("Cancelar", null)
+                    .show()
+            } else {
+                //No hay que mostrar rationale (primera vez o denegado permanentemente) y lanzamos el request directamente
+                permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
         }
+    }
+
+    //Si el permiso de ubicación se deniega permanentemente
+    private fun showPermissionDeniedPermanentlyDialog() {
+        //Mostramos un diálogo que sugiere abrir los ajustes de la app
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Permiso necesario")
+            .setMessage("Has denegado el permiso de ubicación permanentemente. Ve a los ajustes de la aplicación para activarlo.")
+            .setPositiveButton("Abrir ajustes")
+            //Abrimos la pantalla de ajustes al pulsar el botón
+            { _, _ -> openAppSettings() }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    //Abrir la pantalla de ajustes de la app
+    private fun openAppSettings() {
+        //Creamos un intent que abre los ajustes de la app
+        val intent = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        //Le pasamos el paquete de la app para que abra sus ajustes concretamente
+        val uri = android.net.Uri.fromParts("package", packageName, null)
+        intent.data = uri
+        startActivity(intent)
     }
 
     //OBTENER UBICACIÓN

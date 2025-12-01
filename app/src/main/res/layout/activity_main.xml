@@ -11,6 +11,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/blueBackgrounds">
+
+        <ImageView
+            android:id="@+id/btnUseCurrentLocation"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/reload_ubicacion"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/textCity"
         android:layout_width="wrap_content"
