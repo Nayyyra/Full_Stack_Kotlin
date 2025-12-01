@@ -54,7 +54,7 @@ app/
     │     ├── activity_main2.xml  
     │     ├── activity_main3.xml
     │     └── item_favorite_city.xml
-    ├── drawable/           (iconos, fondos, etc.)
+    ├── drawable/           (iconos)
     ├── values/
     │   ├── colors.xml
     │   ├── strings.xml
@@ -132,8 +132,10 @@ de la aplicación y permitir que se acceda a la ubicación siempre que se use la
 - Descripción del tiempo.
 - Humedad y presión.
 - Icono y animación según el clima.
+- Botón para recargar el clima de tu ubicación actual.
 
 # Desde aquí puedes:
+- Recargar el **tiempo actual de tu ubicación**.
 - Ir al **pronóstico de 5 días**.
 - Ir a **buscar ciudades**.
 - Ir a la **lista de ciudades favoritas**.
@@ -190,6 +192,8 @@ Esta pantalla muestra una lista con todas las **ciudades guardadas como favorita
 
     - MainActivity crea la base de datos Room, el WeatherRepository y el WeatherViewModel, observa el estado del tiempo
     mediante LiveData y actualiza textos, iconos, animaciones y notificaciones en función de la información meteorológica recibida.
+
+    - Cuando el usuario pulsa el botón de recarga, MainActivity vuelve a pedir el tiempo para la ubicación actual.
 
     - Cuando el usuario pulsa la tarjeta de “Más detalles”, MainActivity abre Main_Activity2 enviando la latitud y longitud 
     actuales por un Intent para mostrar el pronóstico de esa ubicación.
@@ -323,6 +327,7 @@ Si deseas adaptar el proyecto a tu propio entorno, puedes modificar los siguient
 
 ## La aplicación no muestra datos
 - Comprueba tu conexión a Internet
+- Revisa que la ubicación del dispositivo esté activada
 - Verifica que la API key sea válida
 - Revisa en ajustes del dispositivo que has concedido permisos de ubicación
 

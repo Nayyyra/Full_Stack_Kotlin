@@ -38,6 +38,24 @@ class MainActivity : AppCompatActivity() {
     //Si es true, indica que hemos abierto esta pantalla desde una ciudad favorita
     private var openedFromFavorite: Boolean = false
 
+    //Propiedad y companion
+
+    //SharedPreferences para guardar datos simples como si venimos de favorito y las coordenadas
+    private lateinit var prefs: android.content.SharedPreferences
+
+
+    //Definimos un companion object el cual pertenece a la clase y no a las instancias
+    //Todo lo que esté dentro del companion object es estático y se puede acceder sin crear una instancia de MainActivity
+    companion object {
+        //Guardamos el nombre del archivo de preferencias donde se guardarán los datos
+        private const val PREFS_NAME = "weather_prefs"
+        //Guardamos la clave para saber si venimos de favorito
+        private const val KEY_OPENED_FROM_FAV = "opened_from_fav"
+        //Guardamos las claves para latitud y longitud
+        private const val KEY_LAT = "saved_lat"
+        private const val KEY_LON = "saved_lon"
+    }
+
     // FUNCIÓN PARA CREAR EL CANAL DE NOTIFICACIONES
     private fun createNotificationChannel() {
         //Verificamos si la versión de Android permite enviar notificaciones
@@ -113,6 +131,23 @@ class MainActivity : AppCompatActivity() {
         //Inicializamos fused
         fused = LocationServices.getFusedLocationProviderClient(this)
 
+        //Inicializamos SharedPreferences para guardar los datos
+        prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+
+        //Recuperarmos el estado si se abrio desde favoritos
+        openedFromFavorite = savedInstanceState?.getBoolean(KEY_OPENED_FROM_FAV)
+            ?: prefs.getBoolean(KEY_OPENED_FROM_FAV, false)
+
+        //Recuperamos latitud y longitud guardadas si las hay
+        latitude = savedInstanceState?.getDouble(KEY_LAT)
+            ?: prefs.getString(KEY_LAT, null)?.toDoubleOrNull()
+                //Si no hay nada guardado, inicializamos a 0.0
+                    ?: 0.0
+
+        longitude = savedInstanceState?.getDouble(KEY_LON)
+            ?: prefs.getString(KEY_LON, null)?.toDoubleOrNull()
+                    ?: 0.0
+
 
         //BOTÓN (ICONO) PARA RECARGAR A LA UBICACIÓN ACTUAL
 
@@ -123,6 +158,8 @@ class MainActivity : AppCompatActivity() {
             //Reiniciamos las coordenadas
             latitude = 0.0
             longitude = 0.0
+            //Persistir en prefs que ya no venimos de favorito
+            prefs.edit().putBoolean(KEY_OPENED_FROM_FAV, false).remove(KEY_LAT).remove(KEY_LON).apply()
             //Volvemos a pedir permiso / ubicación
             requestLocationPermission()
             //Mostramos un mensaje usando toast indicando que se está buscando la ubicación actual
@@ -194,14 +231,21 @@ class MainActivity : AppCompatActivity() {
         val cityName = intent.getStringExtra("city_name")
         val cityLat = intent.getDoubleExtra("city_lat", 0.0)
         val cityLon = intent.getDoubleExtra("city_lon", 0.0)
+        //Si vienen datos válidos
         if (cityName != null && cityLat != 0.0 && cityLon != 0.0) {
-            //Si la actividad se abre desde una ciudad guardada en favoritos
+            //Marcamos que la actividad se abre desde una ciudad guardada en favoritos
             openedFromFavorite = true
             //Cargamos estos datos en la UI
             latitude = cityLat
             longitude = cityLon
             //Cargamos el clima para esa ciudad
             vm.load(cityLat, cityLon)
+            //Guardamos en SharedPreferences que venimos de favoritos y las coordenadas
+            prefs.edit()
+                .putBoolean(KEY_OPENED_FROM_FAV, true)
+                .putString(KEY_LAT, cityLat.toString())
+                .putString(KEY_LON, cityLon.toString())
+                .apply()
         }
 
         //Llamamos a la función que observa cambios en los datos del clima y actualiza la UI
@@ -282,16 +326,16 @@ class MainActivity : AppCompatActivity() {
                 //Animación Lottie según clima
                 val animView = binding.weatherAnimation
                 when {
-                            weather.contains("sol") ||
+                    weather.contains("sol") ||
                             weather.contains("despejado") -> {
                         animView.setAnimation(com.example.wheatherapp_full_stack.R.raw.sunny)
                     }
-                            weather.contains("lluvia") ||
+                    weather.contains("lluvia") ||
                             weather.contains("llovizna")||
                             weather.contains("chubasco") -> {
                         animView.setAnimation(com.example.wheatherapp_full_stack.R.raw.rainy)
                     }
-                            weather.contains("nubes") ||
+                    weather.contains("nubes") ||
                             weather.contains("nublado") ||
                             weather.contains("nuboso") ||
                             weather.contains("niebla") ||
@@ -304,14 +348,14 @@ class MainActivity : AppCompatActivity() {
                             weather.contains("vendaval")-> {
                         animView.setAnimation(com.example.wheatherapp_full_stack.R.raw.cloudy)
                     }
-                        weather.contains("tormenta")||
-                        weather.contains("tornado") -> {
+                    weather.contains("tormenta")||
+                            weather.contains("tornado") -> {
                         animView.setAnimation(com.example.wheatherapp_full_stack.R.raw.storm)
                     }
-                        weather.contains("nieve") ||
-                        weather.contains("nevada") ||
-                        weather.contains("nevadas") ||
-                        weather.contains("ventisca") -> {
+                    weather.contains("nieve") ||
+                            weather.contains("nevada") ||
+                            weather.contains("nevadas") ||
+                            weather.contains("ventisca") -> {
                         animView.setAnimation(com.example.wheatherapp_full_stack.R.raw.snow)
                     }
                     else -> {
@@ -437,6 +481,21 @@ class MainActivity : AppCompatActivity() {
 
         //Comenzamos a recibir actualizaciones de la ubicación
         fused.requestLocationUpdates(locationRequest, locationCallback, mainLooper)
+    }
+
+    //Guardamos el estado de la actividad para restaurarlo si se recrea
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        //Guardamos si venimos de favoritos y las coordenadas
+        outState.putBoolean(KEY_OPENED_FROM_FAV, openedFromFavorite)
+        outState.putDouble(KEY_LAT, latitude)
+        outState.putDouble(KEY_LON, longitude)
+        //También guardamos en SharedPreferences por si la app se cierra completamente
+        prefs.edit()
+            .putBoolean(KEY_OPENED_FROM_FAV, openedFromFavorite)
+            .putString(KEY_LAT, if (latitude != 0.0) latitude.toString() else null)
+            .putString(KEY_LON, if (longitude != 0.0) longitude.toString() else null)
+            .apply()
     }
 
 }
