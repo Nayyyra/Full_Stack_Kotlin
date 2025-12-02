@@ -353,7 +353,7 @@ Si deseas adaptar el proyecto a tu propio entorno, puedes modificar los siguient
 
 ### Componentes del equipo
 - Nayra Muñiz
-- Ana Margarita
-- Ainhoa Melgarejo 
+- Ana Roque
+- Ainhoa Sánchez 
 - Shihui Chen
 
